@@ -1242,10 +1242,9 @@ vsc8601_phy_setup_atheros_f1e(uint16_t unit, uint16_t phy_addr)
   /* delay tx_clk */
 
   ag7100_mii_write(unit, phy_addr, 0x1D, 0x5);
-  ag7100_mii_write(unit, phy_addr, 0x1E, 0x3D47);
+  ag7100_mii_write(unit, phy_addr, 0x1E, 0x100);
 
   /* delay rx_clk */
-
   ag7100_mii_write(unit, phy_addr, 0x1D, 0x0);
   ag7100_mii_write(unit, phy_addr, 0x1E, 0x34E);
 }

@@ -21,3 +21,6 @@ tools/dumpimage
 tools/mkenvimage
 tools/gen_eth_addr
 tools/envcrc
+tools/bmp_logo
+tools/img2srec
+tools/inca-swap-bytes

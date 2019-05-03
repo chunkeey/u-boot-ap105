@@ -188,7 +188,9 @@ ag7100_set_pll(ag7100_mac_t *mac, unsigned int pll)
     ar7100_reg_wr(ETH_PLL_CONFIG, val);
     udelay(100);
 
+#ifdef DEBUG
     printf("pll reg %#x: %#x  ", reg, ar7100_reg_rd(reg));
+#endif
 }
 #endif
 

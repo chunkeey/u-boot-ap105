@@ -108,7 +108,7 @@ ar7100_sys_frequency(u32 *cpu_freq, u32 *ddr_freq, u32 *ahb_freq)
 }
 
 
-void serial_init()
+void serial_init(void)
 {
     u32 div;
     u32 ahb_freq = 100000000;
@@ -149,7 +149,7 @@ int serial_tstc (void)
     return(UART16550_READ(OFS_LINE_STATUS) & 0x1);
 }
 
-u8 serial_getc()
+u8 serial_getc(void)
 {
     while(!serial_tstc());
 

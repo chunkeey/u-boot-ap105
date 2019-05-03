@@ -62,7 +62,9 @@ read_id()
     ar7100_spi_done(); 
     /* rd = ar7100_reg_rd(AR7100_SPI_RD_STATUS); */
     rd = ar7100_reg_rd(AR7100_SPI_READ); 
+#ifdef DEBUG
     printf("id read %#x\n", rd);
+#endif
 }
 
 unsigned long 
@@ -98,16 +100,20 @@ flash_erase(flash_info_t *info, int s_first, int s_last)
 {
     int i, sector_size = info->size/info->sector_count;
 
+#ifdef DEBUG
     printf("\nFirst %#x last %#x sector size %#x\n",
            s_first, s_last, sector_size);
-
+#endif
     for (i = s_first; i <= s_last; i++) {
+#ifdef DEBUG
         printf("\b\b\b\b%4d", i);
+#endif
         ar7100_spi_sector_erase(i * sector_size);
     }
     ar7100_spi_done();
+#ifdef DEBUG
     printf("\n");
-
+#endif
     return 0;
 }
 
@@ -122,8 +128,9 @@ write_buff(flash_info_t *info, uchar *source, ulong addr, ulong len)
     int total = 0, len_this_lp, bytes_this_page;
     ulong dst;
     uchar *src;
-    
-    printf ("write addr: %x\n", addr); 
+#ifdef DEBUG
+    printf ("write addr: %x\n", addr);
+#endif
     addr = addr - CFG_FLASH_BASE;
 
     while(total < len) {

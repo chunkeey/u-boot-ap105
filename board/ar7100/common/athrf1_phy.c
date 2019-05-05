@@ -38,6 +38,10 @@ athr_phy_t phy_info[] = {
     {is_enet_port: 1,
      mac_unit    : 1,
      phy_addr    : 0x00}
+#elif defined CFG_BOARD_AP105
+    {is_enet_port: 1,
+     mac_unit    : 0,
+     phy_addr    : 0x00}
 #else
     {is_enet_port: 1,
      mac_unit    : 0,
@@ -58,11 +62,11 @@ ag7100_mii_read(uint32_t phybase, uint16_t phyaddr, uint16_t reg)
     return val;
 }
 
-static void
+/* static void
 ag7100_mii_write(uint32_t phybase, uint16_t phyaddr, uint16_t reg, uint32_t val)
 {
     phy_reg_write(phybase, phyaddr, reg, val);
-}
+} */
 //end of Ken
 
 static athr_phy_t *
@@ -73,11 +77,11 @@ athr_phy_find(int unit)
 
     for(i = 0; i < sizeof(phy_info)/sizeof(athr_phy_t); i++) {
         phy = &phy_info[i];
-        
-        if (phy->is_enet_port && (phy->mac_unit == unit)) 
+
+        if (phy->is_enet_port && (phy->mac_unit == unit))
             return phy;
     }
-    
+
     return NULL;
 }
 
@@ -90,9 +94,9 @@ athr_phy_setup(int unit)
 
     if (!phy) {
         printf(MODULE_NAME": \nNo phy found for unit %d\n", unit);
-        return;
+        return 0;
     }
-    
+
      /*
      * After the phy is reset, it takes a little while before
      * it can respond properly.
@@ -106,26 +110,19 @@ athr_phy_setup(int unit)
 
     /* delay rx_clk */
     phy_reg_write(unit, phy->phy_addr, 0x1D, 0x0);
-#if 0	//Alex:20100806
     phy_reg_write(unit, phy->phy_addr, 0x1E, 0x34E); /* 0x24E - no delay, 0x34E - 2ns delay */
-//Alex:20100806 - {
-#else
-    phy_reg_write(unit, phy->phy_addr, 0x1E, 0x24E); /* 0x24E - no delay, 0x34E - 2ns delay */
-#endif
-//Alex:20100806 - }
+
     /* delay tx_clk */
     phy_reg_write(unit, phy->phy_addr, 0x1D, 0x5);
-#if 0	//Alex:20100806
-    phy_reg_write(unit, phy->phy_addr, 0x1E, 0x3C47); /* 0x3C47 - no delay, 0x3D47 - 1.5ns delay */
-//Alex:20100806 - {
+#ifdef CFG_BOARD_AP105
+    phy_reg_write(unit, phy->phy_addr, 0x1E, 0x100); /* Dumped from Stock Aruba Firmware using mii */
 #else
     phy_reg_write(unit, phy->phy_addr, 0x1E, 0x3D47); /* 0x3C47 - no delay, 0x3D47 - 1.5ns delay */
 #endif
-//Alex:20100806 - }
 
     /* Reset PHYs*/
     phy_reg_write(unit, phy->phy_addr, ATHR_PHY_CONTROL,
-                  ATHR_CTRL_AUTONEGOTIATION_ENABLE 
+                  ATHR_CTRL_AUTONEGOTIATION_ENABLE
                   | ATHR_CTRL_SOFTWARE_RESET);
     //KK
     mdelay(500);
@@ -152,6 +149,8 @@ athr_phy_setup(int unit)
 
     printf(MODULE_NAME": unit %d phy addr %x ", unit, phy->phy_addr);
     printf(MODULE_NAME": reg0 %x\n", ag7100_mii_read(0, phy->phy_addr, 0));
+
+    return 0;
 }
 
 int
@@ -160,7 +159,7 @@ athr_phy_is_up(int unit)
     int status;
     athr_phy_t *phy = athr_phy_find(unit);
 
-    if (!phy) 
+    if (!phy)
         return 0;
     status = ag7100_mii_read(0, phy->phy_addr, ATHR_PHY_SPEC_STATUS);
 
@@ -177,20 +176,20 @@ athr_phy_is_fdx(int unit)
     athr_phy_t *phy = athr_phy_find(unit);
     int ii = 200;
 
-    if (!phy) 
+    if (!phy)
         return 0;
     do {
     status = ag7100_mii_read(0, phy->phy_addr, ATHR_PHY_SPEC_STATUS);
 	     //KK
              mdelay(10);
     } while((!(status & ATHR_STATUS_RESOVLED)) && --ii);
-    
+
     //status = !(!(status & ATHER_STATUS_FULL_DEPLEX));
     if (status & ATHER_STATUS_FULL_DEPLEX)
         status = FULL;
     else
         status = HALF;
-    
+
     return (status);
 }
 int
@@ -200,7 +199,7 @@ athr_phy_speed(int unit)
     athr_phy_t *phy = athr_phy_find(unit);
     int ii = 200;
 
-    if (!phy) 
+    if (!phy)
         return 0;
     do {
         status = ag7100_mii_read(0, phy->phy_addr, ATHR_PHY_SPEC_STATUS);

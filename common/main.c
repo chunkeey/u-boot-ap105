@@ -343,6 +343,21 @@ void main_loop (void)
 	}
 #endif  /* CONFIG_MODEM_SUPPORT */
 
+#ifdef CONFIG_AP105_UBOOTENV_RESET
+	extern flash_info_t flash_info[];	/* info for FLASH chips */
+	extern int do_reset (cmd_tbl_t *cmdtp, int flag, int argc, char *argv[]); /* Reset function */
+	/* Does our crap boot cmd exist in our env? */
+	char *ap105bcmd = strdup(getenv("bootcmd"));
+#ifdef DEBUG
+	debug("DEBUG: %s\n", ap105bcmd);
+#endif
+	if (strcmp(ap105bcmd,"boot ap") == 0) {
+		printf("Stock Aruba U-Boot env detected. Erasing...\n");
+		flash_erase(flash_info,255,255);
+		do_reset(NULL, 0, 0, NULL);
+	}
+#endif /* CONFIG_AP105_UBOOTENV_RESET */
+
 #ifdef CONFIG_VERSION_VARIABLE
 	{
 		extern char version_string[];

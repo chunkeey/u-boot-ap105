@@ -601,6 +601,7 @@ U_BOOT_CMD(
 #endif /* #ifndef COMPRESSED_UBOOT */
 
 #ifdef BOARDCAL
+#ifdef CAL_SECTOR
 /**********************************************************************************
 ** do_mac_setting
 **
@@ -685,4 +686,5 @@ U_BOOT_CMD(
     "                4 digits (decimal) of the serial number\n"
 );
 
+#endif /* CAL_SECTOR */
 #endif /* BOARDCAL */

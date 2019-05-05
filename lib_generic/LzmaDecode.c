@@ -22,6 +22,7 @@
 #ifdef CONFIG_LZMA
 
 #include "LzmaDecode.h"
+#include <common.h>
 
 #define kNumTopBits 24
 #define kTopValue ((UInt32)1 << kNumTopBits)

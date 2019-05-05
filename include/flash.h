@@ -337,6 +337,8 @@ extern void flash_read_factory_serial(flash_info_t * info, void * buffer, int of
 #define FLASH_AMDL640MB 0x0019		/* AMD AM29LV640MB (64M, bottom boot sect)*/
 #define FLASH_AMDL640MT 0x001A		/* AMD AM29LV640MT (64M, top boot sect) */
 
+#define FLASH_25L12845  0x0020		/* MX 25L12845 ID */
+
 #define FLASH_SST200A	0x0040		/* SST 39xF200A ID (  2M = 128K x 16 )	*/
 #define FLASH_SST400A	0x0042		/* SST 39xF400A ID (  4M = 256K x 16 )	*/
 #define FLASH_SST800A	0x0044		/* SST 39xF800A ID (  8M = 512K x 16 )	*/

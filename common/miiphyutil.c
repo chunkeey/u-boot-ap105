@@ -175,7 +175,6 @@ int miiphy_read(char *devname, unsigned char addr, unsigned char reg,
 		if (strcmp(devname, dev->name) == 0) {
 			found_dev = 1;
 			read_ret = dev->read(devname, addr, reg, value);
-			*value = read_ret ;
 			break;
 		}
 	}

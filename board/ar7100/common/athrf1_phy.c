@@ -42,6 +42,13 @@ athr_phy_t phy_info[] = {
     {is_enet_port: 1,
      mac_unit    : 0,
      phy_addr    : 0x00}
+#elif defined CFG_BOARD_AP175
+    {is_enet_port: 1,
+     mac_unit    : 0,
+     phy_addr    : 0x00},
+    {is_enet_port: 1,
+     mac_unit    : 1,
+     phy_addr    : 0x01}
 #else
     {is_enet_port: 1,
      mac_unit    : 0,
@@ -153,6 +160,25 @@ athr_phy_setup(int unit)
     return 0;
 }
 
+#ifdef CFG_BOARD_AP175
+#define IP1001_STATUS_LINK_PASS 0x8000
+#define IP1001_PHY_SPEC_STATUS 17
+athr_phy_is_up(int unit)
+{
+    int status;
+    athr_phy_t *phy = athr_phy_find(unit);
+
+    if (!phy)
+        return 0;
+
+    status = ag7100_mii_read(0, phy->phy_addr, IP1001_PHY_SPEC_STATUS);
+
+    if (status & IP1001_STATUS_LINK_PASS)
+       return 1;
+
+    return 0;
+}
+#else
 int
 athr_phy_is_up(int unit)
 {
@@ -168,6 +194,7 @@ athr_phy_is_up(int unit)
 
     return 0;
 }
+#endif
 
 int
 athr_phy_is_fdx(int unit)
@@ -192,6 +219,39 @@ athr_phy_is_fdx(int unit)
 
     return (status);
 }
+
+#ifdef CFG_BOARD_AP175
+#define IP1001_STATUS_LINK_MASK 0x6000
+#define IP1001_STATUS_LINK_SHIFT 13
+int
+athr_phy_speed(int unit)
+{
+    int status;
+    athr_phy_t *phy = athr_phy_find(1);
+
+    mdelay(20);
+
+    if (!phy)
+        return 0;
+
+    status = ag7100_mii_read(0, phy->phy_addr, 0x11);
+
+    status = ((status & IP1001_STATUS_LINK_MASK) >> IP1001_STATUS_LINK_SHIFT);
+
+    switch(status) {
+    case 0:
+        return _10BASET;
+    case 1:
+        return _100BASET;
+    case 2:
+        return _1000BASET;
+    default:
+        printf(MODULE_NAME": Unkown speed read!\n");
+    }
+    return -1;
+}
+
+#else
 int
 athr_phy_speed(int unit)
 {
@@ -220,3 +280,4 @@ athr_phy_speed(int unit)
     }
     return -1;
 }
+#endif
